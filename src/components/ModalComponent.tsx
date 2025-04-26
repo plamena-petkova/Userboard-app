@@ -10,7 +10,7 @@ import { createUser, updateUser } from "../api/users";
 
 
 type ModalComponentProps = {
-  actionType: ActionType;
+  actionType: ActionType | undefined;
   isModalOpen: boolean;
   onCancel: () => void;
   user?: UserProps;
@@ -87,7 +87,7 @@ const ModalComponent = ({ actionType, isModalOpen, onCancel, user }: ModalCompon
       console.error('Error submitting form:', error);
     }
   };
-  
+
 
   useEffect(() => {
     if (!isModalOpen) {
@@ -105,93 +105,94 @@ const ModalComponent = ({ actionType, isModalOpen, onCancel, user }: ModalCompon
   return (
     <>
       {contextHolder}
-      <Modal
-        title={
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '1.5rem', }}>
-            <EditFilled style={{ color: '#1677FF', margin: 8, fontSize: 48 }} />
-            {actionType === "edit" ? 'Edit User Information' : 'Create User'}
-          </div>
-        }
-        open={isModalOpen}
-        footer={null}
-        style={{ maxWidth: 450 }}
-        closable={false}
-        mask={false}
-      >
-        <p className="form__text">Here, you can update your name, email address, and other information</p>
-        <Form
-          layout="vertical"
-          form={form}
-          name={`user-${actionType}-form`}
-          onFinish={onFinish}
-          initialValues={actionType === 'edit' ? { ...initialData } : { prefixSelector: '48' }}
-          style={{ maxWidth: 400, maxHeight: 600 }}
-          scrollToFirstError>
-          <Form.Item
-            name="name"
-            label="Full Name"
-            style={{ marginBottom: '0.6rem' }}
-            rules={[{ required: true, message: 'Please input your full name' }]}
-          >
-            <Input placeholder="Input" />
-          </Form.Item>
-          <Form.Item
-            name="username"
-            label="Username"
-            style={{ marginBottom: '0.6rem' }}
-            rules={[{ required: true, message: 'Please input your username' }]}
-          >
-            <Input placeholder="Input" />
-          </Form.Item>
-          <Form.Item
-            name="email"
-            label="Email"
-            style={{ marginBottom: '0.6rem' }}
-            rules={[
-              {
-                type: 'email',
-                message: 'The input is not valid e-mail!',
-              },
-              {
-                required: true,
-                message: 'Please input your valid e-mail!',
-              },
-            ]}
-          >
-            <Input placeholder="Input" />
-          </Form.Item>
-          <Form.Item
-            name="phone"
-            label={<span>
-              Phone <span style={{ color: '#999' }}>(optional)</span>
-            </span>}
-            style={{ marginBottom: '0.6rem' }}
-            rules={[{ pattern: /^[0-9]*$/, message: 'The input is not valid!' }]}
-          >
-            <Input addonBefore={prefixSelector} style={{ width: '100%' }} />
-          </Form.Item>
-          <Form.Item
-            name="website"
-            label={<span>
-              Website <span style={{ color: '#999' }}>(optional)</span>
-            </span>}
-            rules={[{ type: 'url', message: 'The input is not valid url!', }]}
-          >
-            <Input placeholder="Input" />
-          </Form.Item>
+      {isModalOpen && actionType && (
+        <Modal
+          title={
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '1.5rem', }}>
+              <EditFilled style={{ color: '#1677FF', margin: 8, fontSize: 48 }} />
+              {actionType === ActionType.Edit ? 'Edit User Information' : 'Create User'}
+            </div>
+          }
+          open={isModalOpen}
+          footer={null}
+          style={{ maxWidth: 450 }}
+          closable={false}
+          mask={false}
+        >
+          <p className="form__text">Here, you can update your name, email address, and other information</p>
+          <Form
+            layout="vertical"
+            form={form}
+            name={`user-${actionType ?? 'default'}-form`}
+            onFinish={onFinish}
+            initialValues={actionType === ActionType.Edit ? { ...initialData } : { prefixSelector: '48' }}
+            style={{ maxWidth: 400, maxHeight: 600 }}
+            scrollToFirstError>
+            <Form.Item
+              name="name"
+              label="Full Name"
+              style={{ marginBottom: '0.6rem' }}
+              rules={[{ required: true, message: 'Please input your full name' }]}
+            >
+              <Input placeholder="Input" />
+            </Form.Item>
+            <Form.Item
+              name="username"
+              label="Username"
+              style={{ marginBottom: '0.6rem' }}
+              rules={[{ required: true, message: 'Please input your username' }]}
+            >
+              <Input placeholder="Input" />
+            </Form.Item>
+            <Form.Item
+              name="email"
+              label="Email"
+              style={{ marginBottom: '0.6rem' }}
+              rules={[
+                {
+                  type: 'email',
+                  message: 'The input is not valid e-mail!',
+                },
+                {
+                  required: true,
+                  message: 'Please input your valid e-mail!',
+                },
+              ]}
+            >
+              <Input placeholder="Input" />
+            </Form.Item>
+            <Form.Item
+              name="phone"
+              label={<span>
+                Phone <span style={{ color: '#999' }}>(optional)</span>
+              </span>}
+              style={{ marginBottom: '0.6rem' }}
+              rules={[{ pattern: /^[0-9]*$/, message: 'The input is not valid!' }]}
+            >
+              <Input addonBefore={prefixSelector} style={{ width: '100%' }} />
+            </Form.Item>
+            <Form.Item
+              name="website"
+              label={<span>
+                Website <span style={{ color: '#999' }}>(optional)</span>
+              </span>}
+              rules={[{ type: 'url', message: 'The input is not valid url!', }]}
+            >
+              <Input placeholder="Input" />
+            </Form.Item>
 
-          <Form.Item>
-            <Row gutter={20}>
-              <Col span={12}>
-                <Button block onClick={onCancel}>Cancel</Button>
-              </Col>
-              <Col span={12}>
-                <Button block type="primary" htmlType="submit" onClick={onCheck}>Save</Button>
-              </Col>
-            </Row>
-          </Form.Item>
-        </Form>
-      </Modal>
+            <Form.Item>
+              <Row gutter={20}>
+                <Col span={12}>
+                  <Button block onClick={onCancel}>Cancel</Button>
+                </Col>
+                <Col span={12}>
+                  <Button block type="primary" htmlType="submit" onClick={onCheck}>Save</Button>
+                </Col>
+              </Row>
+            </Form.Item>
+          </Form>
+        </Modal>)}
     </>
   );
 };

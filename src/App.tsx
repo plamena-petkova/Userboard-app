@@ -12,8 +12,6 @@ import ModalComponent from './components/ModalComponent';
 import { deleteUserRequest } from './api/users';
 
 
-
-
 const App: React.FC = () => {
 
   const columns: TableProps<UserProps>['columns'] = [
@@ -68,7 +66,7 @@ const App: React.FC = () => {
         <Space size="small">
           <Button onClick={() => showModal(user)} icon={<EditFilled />} iconPosition='start' type='primary'>Edit</Button>
           <ModalComponent
-            actionType={ActionType.Edit}
+            actionType={actionTypeString}
             isModalOpen={isModalOpen}
             onCancel={hideModal}
             user={selectedUser}
@@ -95,21 +93,23 @@ const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserProps | undefined>(undefined);
-
+  const [actionTypeString, setActionTypeString] = useState<ActionType>();
 
   const showModal = (user?: UserProps) => {
     setIsModalOpen(true);
     if (user) {
       setSelectedUser(user);
-     
+      setActionTypeString(ActionType.Edit);
     } else {
       setSelectedUser(undefined);
+      setActionTypeString(ActionType.Create);
     }
   };
 
   const hideModal = () => {
     setIsModalOpen(false);
     setSelectedUser(undefined);
+    setActionTypeString(undefined)
   };
 
 
@@ -130,11 +130,10 @@ const App: React.FC = () => {
         <Title className='heading' level={2}>User Information</Title>
         <Button onClick={() => showModal()} type='primary'>Add user</Button>
         <ModalComponent
-          actionType={ActionType.Create}
+          actionType={actionTypeString}
           isModalOpen={isModalOpen}
           onCancel={hideModal}
           user={selectedUser}
-
         />
       </div>
 

@@ -128,7 +128,7 @@ const App: React.FC = () => {
     <div className='container'>
       <div className="container__title">
         <Title className='heading' level={2}>User Information</Title>
-        <Button onClick={() => showModal()} type='primary'>Add user</Button>
+        <Button onClick={() => showModal()} type='primary'>New User</Button>
         <ModalComponent
           actionType={actionTypeString}
           isModalOpen={isModalOpen}

@@ -35,6 +35,8 @@ const ModalComponent = ({ actionType, isModalOpen, onCancel, user }: ModalCompon
     website: user?.website,
   }
 
+  const formName = `user-${actionType}-${uuidv4()}`;
+
 
   const prefixSelector = (
     <Form.Item name="prefix" noStyle>
@@ -105,8 +107,9 @@ const ModalComponent = ({ actionType, isModalOpen, onCancel, user }: ModalCompon
   return (
     <>
       {contextHolder}
-      {isModalOpen && actionType && (
+      {true && (
         <Modal
+        forceRender
           title={
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '1.5rem', }}>
               <EditFilled style={{ color: '#1677FF', margin: 8, fontSize: 48 }} />
@@ -123,7 +126,7 @@ const ModalComponent = ({ actionType, isModalOpen, onCancel, user }: ModalCompon
           <Form
             layout="vertical"
             form={form}
-            name={`user-${actionType ?? 'default'}-form`}
+            name={formName}
             onFinish={onFinish}
             initialValues={actionType === ActionType.Edit ? { ...initialData } : { prefixSelector: '48' }}
             style={{ maxWidth: 400, maxHeight: 600 }}

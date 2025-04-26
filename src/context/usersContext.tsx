@@ -1,43 +1,76 @@
 import {
-    createContext,
-    useContext,
-    useEffect,
-    useState,
-  } from "react";
-  import { UserProps, UsersProviderProps } from "../types/userInterfaces";
-  import { getUsers } from "../api/users";
-  
-
-  export const UsersContext = createContext<UserProps[] | undefined>(undefined);
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { UserProps, UsersContextProps, UsersProviderProps } from "../types/userInterfaces";
+import { getUsers } from "../api/users";
+import { getUsersFromStorage, saveUsersToStorage } from "../utils/userStorage";
 
 
-  export const UsersProvider = ({ children }: UsersProviderProps) => {
-    const [users, setUsers] = useState<UserProps[]>([]);
-  
-    useEffect(() => {
+export const UsersContext = createContext<UsersContextProps | undefined>(undefined);
+
+
+export const UsersProvider = ({ children }: UsersProviderProps) => {
+
+  const [users, setUsers] = useState<UserProps[]>(getUsersFromStorage);
+
+
+  useEffect(() => {
+    if (users.length === 0) {
       getUsers()
         .then((data) => {
-          if (data) {
+          if (data && data.length > 0) {
             setUsers(data);
+            saveUsersToStorage(data);
           }
         })
         .catch(console.error);
-    }, []);
-  
-    return (
-        <UsersContext.Provider value={users} >
-          {children}
-        </UsersContext.Provider>
-      );
-  };
-  
-  export const useUsersContext = () => {
-    const users = useContext(UsersContext);
-  
-    if (!users) {
-      throw new Error("UsersContext must be used within a UsersProvider");
     }
-  
-    return users;
+  }, [users.length]);
+
+
+  useEffect(() => {
+    if (users.length > 0) {
+      saveUsersToStorage(users);
+    }
+  }, [users]);
+
+
+  const deleteUser = (id: string) => {
+    setUsers((prev) => prev.filter((user) => user.id !== id));
+  };
+
+  const addUser = (user: UserProps) => {
+    setUsers((prev) => [...prev, user]);
   };
   
+  const editUser = (updatedUser: UserProps) => {
+    console.log('Edit', users);
+    if(users.find((user) => user.id === updatedUser.id)) {
+
+      setUsers((prev) =>
+        prev.map((user) => (user.id === updatedUser.id ? updatedUser : user))
+      );
+    }
+    
+  };
+
+
+  return (
+    <UsersContext.Provider value={{ users, deleteUser, addUser, editUser }} >
+      {children}
+    </UsersContext.Provider>
+  );
+};
+
+export const useUsersContext = () => {
+  const users = useContext(UsersContext);
+
+  if (!users) {
+    throw new Error("UsersContext must be used within a UsersProvider");
+  }
+
+  return users;
+};

@@ -1,29 +1,25 @@
 import '../App.css'
 import { Button, Col, Form, Input, Modal, Row, Select, notification } from "antd";
 import { EditFilled } from '@ant-design/icons';
-import { useEffect } from "react";
-import { ActionType, UserProps } from "../types/userInterfaces";
+import { useEffect, useState } from "react";
+import { ActionType, ModalComponentProps, UserProps } from "../types/interfaces";
 import { useUsersContext } from "../context/usersContext";
 import { v4 as uuidv4 } from 'uuid';
 import { CheckCircleFilled } from '@ant-design/icons';
 import { createUser, updateUser } from "../api/users";
-
-
-type ModalComponentProps = {
-  actionType: ActionType | undefined;
-  isModalOpen: boolean;
-  onCancel: () => void;
-  user?: UserProps;
-};
+import { parsePhone } from '../utils/parsePhone';
 
 
 const ModalComponent = ({ actionType, isModalOpen, onCancel, user }: ModalComponentProps) => {
+  const { addUser, editUser } = useUsersContext();
+  const [api, contextHolder] = notification.useNotification();
+
   const [form] = Form.useForm();
   const { Option } = Select;
 
-  const { addUser, editUser } = useUsersContext();
+  const [lastActionType, setLastActionType] = useState<ActionType | undefined>(actionType);
 
-  const [api, contextHolder] = notification.useNotification();
+  const parsedPhone = user?.phone ? parsePhone(user.phone) : { prefix: '', phone: '', extension: undefined };
 
   const initialData: UserProps = {
     id: user?.id,
@@ -31,26 +27,38 @@ const ModalComponent = ({ actionType, isModalOpen, onCancel, user }: ModalCompon
     username: user?.username,
     email: user?.email,
     company: user?.company,
-    phone: user?.phone,
     website: user?.website,
+    prefix: parsedPhone.prefix,
+    phone: parsedPhone.phone,
+    extension: parsedPhone.extension,
   }
 
   const formName = `user-${actionType}-${uuidv4()}`;
-
+  const modalTitle = lastActionType === ActionType.Edit ? 'Edit User Information' : 'Create User';
 
   const prefixSelector = (
     <Form.Item name="prefix" noStyle>
       <Select style={{ width: 70 }}>
-        <Option value="48">+48</Option>
-        <Option value="359">+359</Option>
+        {actionType === ActionType.Edit && user?.prefix && (
+          <Option value={user.prefix}>{`+${user.prefix}`}</Option>
+        )}
+
+        {actionType === ActionType.Create || (user && user.prefix !== '48') ? (
+          <Option value="48">+48</Option>
+        ) : null}
+
+        {actionType === ActionType.Create || (user && user.prefix !== '359') ? (
+          <Option value="359">+359</Option>
+        ) : null}
+
       </Select>
     </Form.Item>
   );
 
+
   const onCheck = async () => {
     try {
-      const values = await form.validateFields();
-      console.log('Success:', values);
+      await form.validateFields();
     } catch (errorInfo) {
       console.log('Failed:', errorInfo);
     }
@@ -68,21 +76,26 @@ const ModalComponent = ({ actionType, isModalOpen, onCancel, user }: ModalCompon
 
   const onFinish = async (values: UserProps) => {
     try {
+      const fullPhone = values.prefix ? `+${values.prefix} ${values.phone}` : values.phone;
+
+      const updatedValues = { ...values, phone: fullPhone };
+
       if (actionType === ActionType.Create) {
-        const newUser = { ...values, id: uuidv4() };
+        const newUser = { ...updatedValues, id: uuidv4() };
         const result = await createUser(newUser);
         if (result) {
           addUser(newUser);
           openNotification('User Created', 'A new user has been successfully added.');
         }
       } else if (actionType === ActionType.Edit) {
-        const editedUser = { ...values, id: user?.id };
+        const editedUser = { ...updatedValues, id: user?.id };
         const result = await updateUser(editedUser);
         if (result) {
           editUser(editedUser);
-          openNotification('Information Updated', 'Your information has been successfully updated!');
+          openNotification('Information Updated', 'Your information has been successfully updated! Thank you for keeping your details current.');
         }
       }
+
       form.resetFields();
       onCancel();
     } catch (error) {
@@ -90,18 +103,19 @@ const ModalComponent = ({ actionType, isModalOpen, onCancel, user }: ModalCompon
     }
   };
 
-
   useEffect(() => {
     if (!isModalOpen) {
       form.resetFields();
-    }
-  }, [isModalOpen]);
-
-  useEffect(() => {
-    if (isModalOpen && initialData) {
+    } else if (isModalOpen && initialData) {
       form.setFieldsValue(initialData);
     }
-  }, [isModalOpen, initialData, form]);
+
+    if (actionType !== undefined) {
+      setLastActionType(actionType);
+    }
+
+  }, [isModalOpen, initialData, actionType, form]);
+
 
 
   return (
@@ -109,11 +123,12 @@ const ModalComponent = ({ actionType, isModalOpen, onCancel, user }: ModalCompon
       {contextHolder}
       {true && (
         <Modal
-        forceRender
+          forceRender
           title={
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '1.5rem', }}>
               <EditFilled style={{ color: '#1677FF', margin: 8, fontSize: 48 }} />
-              {actionType === ActionType.Edit ? 'Edit User Information' : 'Create User'}
+              {modalTitle}
+
             </div>
           }
           open={isModalOpen}
@@ -128,7 +143,7 @@ const ModalComponent = ({ actionType, isModalOpen, onCancel, user }: ModalCompon
             form={form}
             name={formName}
             onFinish={onFinish}
-            initialValues={actionType === ActionType.Edit ? { ...initialData } : { prefixSelector: '48' }}
+            initialValues={actionType === ActionType.Edit ? { ...initialData } : { prefixSelector: user ? user.prefix : '' }}
             style={{ maxWidth: 400, maxHeight: 600 }}
             scrollToFirstError>
             <Form.Item
@@ -170,7 +185,6 @@ const ModalComponent = ({ actionType, isModalOpen, onCancel, user }: ModalCompon
                 Phone <span style={{ color: '#999' }}>(optional)</span>
               </span>}
               style={{ marginBottom: '0.6rem' }}
-              rules={[{ pattern: /^[0-9]*$/, message: 'The input is not valid!' }]}
             >
               <Input addonBefore={prefixSelector} style={{ width: '100%' }} />
             </Form.Item>

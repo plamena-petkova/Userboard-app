@@ -1,4 +1,4 @@
-import { UserProps } from "../types/userInterfaces";
+import { UserProps } from "../types/interfaces";
 
 const BASE_URL = "https://jsonplaceholder.typicode.com/users";
 
@@ -22,8 +22,14 @@ const BASE_URL = "https://jsonplaceholder.typicode.com/users";
     }
   }
 
-
   export async function updateUser(user: UserProps): Promise<UserProps | null> {
+    //jsonplaceholder returns 500 if it's not one of the users id = 1 to 10, new users has string id
+    if (typeof user.id === 'string') {
+      return {
+        ...user,
+      };
+    }
+  
     const url = `${BASE_URL}/${user.id}`;
     try {
       const response = await fetch(url, {
@@ -39,8 +45,8 @@ const BASE_URL = "https://jsonplaceholder.typicode.com/users";
       }
   
       const updatedUser = await response.json();
-     
-      return updatedUser; 
+      return updatedUser;
+  
     } catch (error) {
       if (error instanceof Error) {
         console.error(error.message);
@@ -50,6 +56,7 @@ const BASE_URL = "https://jsonplaceholder.typicode.com/users";
       return null;
     }
   }
+  
 
   export async function createUser(user: UserProps): Promise<UserProps | null> {
     const url = BASE_URL;

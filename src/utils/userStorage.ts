@@ -1,4 +1,4 @@
-import { UserProps } from "../types/userInterfaces";
+import { UserProps } from "../types/interfaces";
 
 
 export const saveUsersToStorage = (users: UserProps[]) => {

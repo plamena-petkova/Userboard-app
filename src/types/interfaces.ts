@@ -6,8 +6,10 @@ export interface UserProps {
   username?:string;
   email?: string;
   company?: CompanyProps;
-  phone?: string;
   website?: string;
+  phone?: string;
+  prefix?:string;
+  extension?:string;
 }
 
 export interface CompanyProps {
@@ -31,3 +33,10 @@ export enum ActionType {
   Create = 'create',
   Edit = 'edit',
 }
+
+export type ModalComponentProps = {
+  actionType: ActionType | undefined;
+  isModalOpen: boolean;
+  onCancel: () => void;
+  user?: UserProps;
+};

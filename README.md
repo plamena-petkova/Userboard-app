@@ -1,54 +1,56 @@
-# React + TypeScript + Vite
+# User Management Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Purpose
 
-Currently, two official plugins are available:
+This is a **User Management Dashboard** where:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- A list of users with details such as Name, Email, Company, Phone, and Website are listed
+  - The request to jsonplaceholder is made and then all the users are stored locally through localStorage - the task is small, otherwise other state management tools can be used such as Redux.
+  - The emails are displayed as clickable links that open the user's default email client when clicked (using `mailto:`).
+  - The phones are formatted as prefix, 9 digits and extension - this can be modified for special needs and also third party libraries can be used
+  - The urls are listed as they are coming from jsonplaceholder - if they are stored properly the link is opening the page. 
 
-## Expanding the ESLint configuration
+- Edit existing users
+  -All the fields has rules - the required fields are marked and if we try to save we will receive ui message that they are required
+  -The url has rule for validation - if we try to type not url we will receive message
+  -The email has rule for validation 
+  -The prefix can be changed - only 359 and 48 are added and the prefix of the edited phone number
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Delete users from the list.
+  - Popconfirm window appears - if we confirm delete locally the user from the list
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+- Create new users
+  -Add new user with the same modal we are using for edit 
+  -All the rules are applicable
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+-Notification
+  -There are notification for creating and editing user as a popup window
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+The application uses **React** with **TypeScript** and **Ant Design** for the UI. It’s bundled using **Vite**.
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+## Features
+
+- **User List**: Displayed in a table format with columns for Name, Company, Email, Phone, and Website.
+- **Pagination**: 5 users per page, with navigation to switch between pages.
+- **Create User**: Open a modal to input new user data.
+- **Edit User**: Edit existing user details via a modal.
+- **Delete User**: Remove a user from the list.
+
+## Technologies
+
+- **React** for building UI components.
+- **TypeScript** for static typing.
+- **Ant Design** for pre-built UI components.
+- **Vite** for fast bundling and development server.
+
+## Setup
+
+1. Clone the repository:
+   git clone https://github.com/plamena-petkova/Userboard-app.git
+
+2. Install dependencies:
+  cd Userboard-app
+  npm install
+
+3. Start the development server:
+  npm run dev

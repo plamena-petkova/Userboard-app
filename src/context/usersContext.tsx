@@ -4,7 +4,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { UserProps, UsersContextProps, UsersProviderProps } from "../types/userInterfaces";
+import { UserProps, UsersContextProps, UsersProviderProps } from "../types/interfaces";
 import { getUsers } from "../api/users";
 import { getUsersFromStorage, saveUsersToStorage } from "../utils/userStorage";
 
@@ -47,7 +47,6 @@ export const UsersProvider = ({ children }: UsersProviderProps) => {
   };
   
   const editUser = (updatedUser: UserProps) => {
-    console.log('Edit', users);
     if(users.find((user) => user.id === updatedUser.id)) {
 
       setUsers((prev) =>

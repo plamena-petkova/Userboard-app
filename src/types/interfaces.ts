@@ -40,3 +40,16 @@ export type ModalComponentProps = {
   onCancel: () => void;
   user?: UserProps;
 };
+
+export interface NotificationContextType {
+  openNotification: (
+    type: 'success' | 'error' | 'info' | 'warning', 
+    message: string, 
+    description: string
+  ) => void;
+}
+
+
+export interface NotificationProviderProps {
+  children: ReactNode;
+}

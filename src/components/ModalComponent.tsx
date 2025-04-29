@@ -5,17 +5,19 @@ import { useEffect, useState } from "react";
 import { ActionType, ModalComponentProps, UserProps } from "../types/interfaces";
 import { useUsersContext } from "../context/usersContext";
 import { v4 as uuidv4 } from 'uuid';
-import { CheckCircleFilled } from '@ant-design/icons';
 import { createUser, updateUser } from "../api/users";
 import { parsePhone } from '../utils/parsePhone';
+import { useNotification } from '../context/notificationContext';
+
 
 
 const ModalComponent = ({ actionType, isModalOpen, onCancel, user }: ModalComponentProps) => {
   const { addUser, editUser } = useUsersContext();
-  const [api, contextHolder] = notification.useNotification();
 
   const [form] = Form.useForm();
   const { Option } = Select;
+
+  const { openNotification } = useNotification();
 
   const [lastActionType, setLastActionType] = useState<ActionType | undefined>(actionType);
 
@@ -61,17 +63,8 @@ const ModalComponent = ({ actionType, isModalOpen, onCancel, user }: ModalCompon
       await form.validateFields();
     } catch (errorInfo) {
       console.log('Failed:', errorInfo);
+      openNotification('warning', 'Warning', 'Fields need to be filled!')
     }
-  };
-
-
-  const openNotification = (message: string, description: string) => {
-    api.success({
-      message,
-      description,
-      placement: 'top',
-      icon: <CheckCircleFilled style={{ color: '#52c41a' }} />,
-    });
   };
 
   const onFinish = async (values: UserProps) => {
@@ -85,14 +78,20 @@ const ModalComponent = ({ actionType, isModalOpen, onCancel, user }: ModalCompon
         const result = await createUser(newUser);
         if (result) {
           addUser(newUser);
-          openNotification('User Created', 'A new user has been successfully added.');
+          openNotification('success', 'User Created', 'A new user has been successfully added.');
+        }
+        if (!result) {
+          openNotification('error', 'User Not created', 'Error occured!');
         }
       } else if (actionType === ActionType.Edit) {
         const editedUser = { ...updatedValues, id: user?.id };
         const result = await updateUser(editedUser);
         if (result) {
           editUser(editedUser);
-          openNotification('Information Updated', 'Your information has been successfully updated! Thank you for keeping your details current.');
+          openNotification('success', 'Information Updated', 'Your information has been successfully updated! Thank you for keeping your details current.');
+        }
+        if (!result) {
+          openNotification('error', 'User Not updated', 'Error occured!');
         }
       }
 
@@ -120,7 +119,6 @@ const ModalComponent = ({ actionType, isModalOpen, onCancel, user }: ModalCompon
 
   return (
     <>
-      {contextHolder}
       {true && (
         <Modal
           forceRender

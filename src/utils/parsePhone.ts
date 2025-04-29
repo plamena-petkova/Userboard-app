@@ -25,7 +25,7 @@ export function parsePhone(fullPhone: string) {
     console.error('Invalid phone length', digitsOnly);
   }
   
-  if (phone.startsWith('0')) {
+  if (prefix && phone.startsWith('0')) {
     phone = phone.slice(1);
   }
 

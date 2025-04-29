@@ -24,11 +24,11 @@ const BASE_URL = "https://jsonplaceholder.typicode.com/users";
 
   export async function updateUser(user: UserProps): Promise<UserProps | null> {
     //jsonplaceholder returns 500 if it's not one of the users id = 1 to 10, new users has string id
-    if (typeof user.id === 'string') {
-      return {
-        ...user,
-      };
-    }
+    // if (typeof user.id === 'string') {
+    //   return {
+    //     ...user,
+    //   };
+    // }
   
     const url = `${BASE_URL}/${user.id}`;
     try {

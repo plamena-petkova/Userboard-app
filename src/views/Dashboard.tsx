@@ -67,7 +67,7 @@ const Dashboard = () => {
             key: 'website',
             render: (url) => {
                 if (url) {
-                    return <a className='user__website' target='_blank' href={`${url}`}>{`${url}`}</a>
+                    return <a className='user__website' target='_blank' href={`https://${url}`}>{`${url}`}</a>
                 }
                 return <span>-</span>
             }

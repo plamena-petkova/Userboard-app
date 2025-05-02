@@ -1,5 +1,5 @@
 import '../App.css'
-import { Button, Col, Form, Input, Modal, Row, Select, notification } from "antd";
+import { Button, Col, Form, Input, Modal, Row, Select } from "antd";
 import { EditFilled } from '@ant-design/icons';
 import { useEffect, useState } from "react";
 import { ActionType, ModalComponentProps, UserProps } from "../types/interfaces";
@@ -82,6 +82,7 @@ const ModalComponent = ({ actionType, isModalOpen, onCancel, user }: ModalCompon
         }
         if (!result) {
           openNotification('error', 'User Not created', 'Error occured!');
+          return;
         }
       } else if (actionType === ActionType.Edit) {
         const editedUser = { ...updatedValues, id: user?.id };
@@ -92,6 +93,7 @@ const ModalComponent = ({ actionType, isModalOpen, onCancel, user }: ModalCompon
         }
         if (!result) {
           openNotification('error', 'User Not updated', 'Error occured!');
+          return;
         }
       }
 
